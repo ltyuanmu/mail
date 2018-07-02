@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  context-path: /custom-mail
+mail:
+  host: mail.newtouch.com
+  username: newtouchcloud@newtouch.com
+  password: p3Yy69dl6i
+spring:
+  http:
+    multipart:
+      maxFileSize: 10Mb
+      maxRequestSize: 20Mb
+security:
+  user:
+    name: yangxianjie
+    password: 1qazxsw2

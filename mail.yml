@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: custom-mail
+  namespace: step
+  labels:
+    app: custom-mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-mail
+  template:
+    metadata:
+      labels:
+        app: custom-mail
+    spec:
+      hostname: custom-mail
+      containers:
+        - name: custom-mail
+          image: registry.stepwork.newtouch.com/one/mail:2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: custom-mail
+  namespace: step
+  labels:
+    app: custom-mail
+spec:
+  selector:
+    app: custom-mail
+  type: ClusterIP
+  ports:
+    - name: tomcat
+      port: 8080

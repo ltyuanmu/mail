@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>邮件发送服务</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="js/sockjs.min.js"></script>
+    <script type="text/javascript" src="js/stomp.min.js"></script>
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script language="javascript">
+		window.onload=function(){
+
+			var socket = new SockJS(`/custom-mail/ws`);
+            var stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                stompClient.subscribe('/custom-mail/topic/mail/record', function(message) {
+                    $("#log").append(message.body + "<br>");
+                    var domHeight = $(document).height();
+                    var scroll = $(window).height() + $(window).scrollTop();
+                    if(domHeight-scroll<=50){
+                        $("br:last")[0].scrollIntoView();
+                    }
+                });
+            });
+		}
+	</script>
+    <script>
+    $(document).ready(function(){
+        $('#mainForm').submit(function(){
+             $(this).ajaxSubmit({
+                url:  $(this).attr("action"),
+                type: $(this).attr("method"),
+                success: function(data) {
+                    $("#response").html(data);
+                },
+                error:function(data) {
+                    $("#response").html(data.responseText);
+                },
+                clearForm: false,//禁止清楚表单
+                resetForm: false //禁止重置表单
+             });
+             return false;
+        });
+        $('#clear').click(function(){
+             $("#log").html('');
+        });
+        $('#stop').click(function(){
+             $.get("/custom-mail/mail/stop");
+              return false;
+        });
+    });
+    </script>
+</head>
+<body>
+<form id="mainForm" action="/custom-mail/mail/send" method="post" enctype="multipart/form-data">
+    邮件标题:<input type="text" name="subject" /><br>
+    邮箱内容文件:<input type="file" name="content" /><br>
+    邮箱用户文件:<input type="file" name="email" />
+    <input id="send" type="submit" value="发送邮件" /><br>
+</form>
+<div id="response"></div>
+<span>LOG</span> <button id="clear">清除日志</button><button id="stop">停止</button> <br>
+<div id ="log">
+</div>
+</body>
